@@ -27,7 +27,9 @@ public class MovementLambda implements RequestHandler<Map<String, Object>, Map<S
 
         double deltaLat = (latB - latA) / steps;
         double deltaLng = (lngB - lngA) / steps;
-
+        
+        
+        // Calculamos los puntos intermedios
         List<Map<String, Double>> points = new ArrayList<>();
         for (int i = 0; i <= steps; i++) {
             Map<String, Double> point = new HashMap<>();
@@ -35,7 +37,9 @@ public class MovementLambda implements RequestHandler<Map<String, Object>, Map<S
             point.put("lng", lngA + deltaLng * i);
             points.add(point);
         }
-
+        
+        
+        // Respuesta con los puntos intermedios
         Map<String, Object> response = new HashMap<>();
         response.put("points", points);
         return response;
