@@ -71,41 +71,41 @@
         }
 
 
-        // function moveMarker() {
-        //     let stepCount = 0;
-        //     const deltaLat = (pointB.lat - pointA.lat) / steps;
-        //     const deltaLng = (pointB.lng - pointA.lng) / steps;
-
-        //     const interval = setInterval(() => {
-        //         if (stepCount >= steps) {
-        //             clearInterval(interval);
-        //             return;
-        //         }
-
-        //         // Actualizar la posición del marcador
-        //         const newLat = pointA.lat + deltaLat * stepCount;
-        //         const newLng = pointA.lng + deltaLng * stepCount;
-        //         marker.setPosition({ lat: newLat, lng: newLng });
-
-        //         stepCount++;
-        //     }, delay);
-        // }
-
-        //moveMarker para usar el backend
-        async function moveMarker() {
-            const points = await getCoordinates();
+        function moveMarker() {
             let stepCount = 0;
+            const deltaLat = (pointB.lat - pointA.lat) / steps;
+            const deltaLng = (pointB.lng - pointA.lng) / steps;
 
             const interval = setInterval(() => {
-                if (stepCount >= points.length) {
+                if (stepCount >= steps) {
                     clearInterval(interval);
                     return;
                 }
-                const { lat, lng } = points[stepCount];
-                marker.setPosition({ lat, lng });
+
+                // Actualizar la posición del marcador
+                const newLat = pointA.lat + deltaLat * stepCount;
+                const newLng = pointA.lng + deltaLng * stepCount;
+                marker.setPosition({ lat: newLat, lng: newLng });
+
                 stepCount++;
             }, delay);
         }
+
+        //moveMarker para usar el backend
+        // async function moveMarker() {
+        //     const points = await getCoordinates();
+        //     let stepCount = 0;
+
+        //     const interval = setInterval(() => {
+        //         if (stepCount >= points.length) {
+        //             clearInterval(interval);
+        //             return;
+        //         }
+        //         const { lat, lng } = points[stepCount];
+        //         marker.setPosition({ lat, lng });
+        //         stepCount++;
+        //     }, delay);
+        // }
 
 
         // Inicializar el mapa
