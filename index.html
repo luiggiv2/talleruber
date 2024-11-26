@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa con Movimiento</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOool4HPyYq9aJvHrFChzuHqgtXW2YTZI"></script>
+    <style>
+        #map {
+            height: 100vh;
+            /* El mapa ocupa toda la pantalla */
+            width: 100%;
+        }
+
+        #startButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 5;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="startButton">Ejecutar Movimiento</div>
+    <div id="map"></div>
+
+    <script>
+        // Variables de configuración
+        const pointA = { lat: 4.701130, lng: -74.032885 }; // San Francisco
+        const pointB = { lat: 4.710706, lng: -74.032714 }; // Los Ángeles
+        const steps = 100; // Número de pasos en el movimiento
+        const delay = 50; // Tiempo entre pasos (ms)
+
+        let map, marker;
+
+        function initMap() {
+            // Inicializar el mapa
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: pointA,
+                zoom: 15,
+            });
+
+            // Agregar marcador en el punto A
+            marker = new google.maps.Marker({
+                position: pointA,
+                map: map,
+            });
+        }
+
+        //Solicitudes desde el Frontend
+        async function getCoordinates() {
+            const response = await fetch('https://3v3e46n3lk.execute-api.us-east-1.amazonaws.com/prod', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    latA: pointA.lat,
+                    lngA: pointA.lng,
+                    latB: pointB.lat,
+                    lngB: pointB.lng,
+                    steps: 100,
+                }),
+            });
+            const data = await response.json();
+            return data.points; // Lista de puntos calculados
+        }
+
+
+        // function moveMarker() {
+        //     let stepCount = 0;
+        //     const deltaLat = (pointB.lat - pointA.lat) / steps;
+        //     const deltaLng = (pointB.lng - pointA.lng) / steps;
+
+        //     const interval = setInterval(() => {
+        //         if (stepCount >= steps) {
+        //             clearInterval(interval);
+        //             return;
+        //         }
+
+        //         // Actualizar la posición del marcador
+        //         const newLat = pointA.lat + deltaLat * stepCount;
+        //         const newLng = pointA.lng + deltaLng * stepCount;
+        //         marker.setPosition({ lat: newLat, lng: newLng });
+
+        //         stepCount++;
+        //     }, delay);
+        // }
+
+        //moveMarker para usar el backend
+        async function moveMarker() {
+            const points = await getCoordinates();
+            let stepCount = 0;
+
+            const interval = setInterval(() => {
+                if (stepCount >= points.length) {
+                    clearInterval(interval);
+                    return;
+                }
+                const { lat, lng } = points[stepCount];
+                marker.setPosition({ lat, lng });
+                stepCount++;
+            }, delay);
+        }
+
+
+        // Inicializar el mapa
+        window.onload = () => {
+            initMap();
+
+            // Agregar evento al botón
+            document.getElementById("startButton").addEventListener("click", () => {
+                moveMarker();
+            });
+        };
+    </script>
+</body>
+
+</html>
